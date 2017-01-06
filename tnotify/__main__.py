@@ -3,7 +3,9 @@ import webbrowser
 import json
 import time
 import sys
+import os
 from colorama import init, Fore, Back, Style
+
 
 
 def init_credentials(filename="auth.json"):
@@ -23,15 +25,26 @@ def get_auth_credentials(auth):
     verifier = input("Enter PIN (will write credentials to file): ")
     auth.get_access_token(verifier)
 
+auth_path = None
+for fn in [os.path.join(os.path.expanduser("~"), ".tnotify", "auth.json")]:
+    try:
+        creds = init_credentials(filename=fn)
+    except FileNotFoundError:
+        continue
+    else:
+        auth_path = fn
+        break
 
-creds = init_credentials()
+if not auth_path:
+    raise FileNotFoundError("Could not find auth.json.")
+
 auth = tweepy.OAuthHandler(creds["consumer_token"], creds["consumer_secret"])
 
 try:
     auth.set_access_token(creds["authorization_token"], creds["authorization_secret"])
 except:
     get_auth_credentials(auth)
-    write_auth_credentials(auth, creds)
+    write_auth_credentials(auth, creds, filename=auth_path)
 
 api = tweepy.API(auth, wait_on_rate_limit=False, wait_on_rate_limit_notify=False)
 replies = dict()

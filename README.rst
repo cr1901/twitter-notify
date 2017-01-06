@@ -24,8 +24,9 @@ Installation
 | To invoke a Twitter Notify, use the following command:
 | ``python3 -m tnotify``
 
-No input arguments for now! A file named ``auth.json`` must exist in the
-current directory that is accepted by the following schema:
+No input arguments for now! A file named ``auth.json`` must exist in either
+the invocation directory or ``~/.tnotify``. ``auth.json`` must obey the
+following schema:
 
 ::
 
