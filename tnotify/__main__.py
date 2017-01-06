@@ -48,51 +48,20 @@ except:
     write_auth_credentials(auth, creds, filename=auth_path)
 
 api = tweepy.API(auth, wait_on_rate_limit=False, wait_on_rate_limit_notify=False)
-replies = dict()
-dms = dict()
 init(wrap=False)
 
 fore_colors = [Fore.RED, Fore.GREEN, Fore.YELLOW, Fore.BLUE, Fore.MAGENTA, Fore.CYAN, Fore.WHITE]
 back_colors = [Back.RED, Back.GREEN, Back.YELLOW, Back.BLUE, Back.MAGENTA, Back.CYAN, Back.WHITE]
 i = 0
 
-conn = Source(api)
-for n in conn:
-    msg_str = "reply " if n.msg_type == Notification.Timeline else "DM "
-    try:
-        print("New " + msg_str + "from " + n.sender + ": " + n.text)
-    except UnicodeEncodeError:
-        print("New " + msg_str + "from " + n.sender + ": " + "UnicodeEncodeError")
-    sys.stdout.flush()
-
 # Potential tweepy.error.TweepError for timeout... retry?
-while True:
-    mentions = api.mentions_timeline(20)
-    messages = api.direct_messages(20)
-    new_replies = False
-    new_dms = False
-    for m in reversed(mentions):
-        if not m.id in replies:
-            try:
-                print(fore_colors[i] + "New reply from " + m.user.screen_name + ": " + m.text)
-            except UnicodeEncodeError:
-                print(fore_colors[i] + "New reply from " + m.user.screen_name + ": " + "UnicodeEncodeError")
-            replies[m.id] = m
-            new_replies = True
-
-    for d in reversed(messages):
-        if not d.id in dms:
-            try:
-                print(fore_colors[i] + "New DM from " + d.sender.screen_name + ": " + d.text)
-            except UnicodeEncodeError:
-                print(fore_colors[i] + "New DM from " + d.sender.screen_name + ": " + "UnicodeEncodeError")
-            dms[d.id] = d
-            new_dms = True
-    # for mentions in tweepy.Cursor(api.mentions_timeline).items(20):
-    #     if not mentions.id in replies:
-    #         print("New reply from ".encode("utf-8") + mentions.user.screen_name.encode("utf-8") + ": ".encode("utf-8") + mentions.text.encode("utf-8"))
-    #         replies[mentions.id] = mentions
+conn = Source(api)
+for nots in conn:
+    for n in nots:
+        msg_str = "reply " if n.msg_type == Notification.Timeline else "DM "
+        try:
+            print(fore_colors[i] + "New " + msg_str + "from " + n.sender + ": " + n.text)
+        except UnicodeEncodeError:
+            print(fore_colors[i] +  "New " + msg_str + "from " + n.sender + ": " + "UnicodeEncodeError")
     sys.stdout.flush()
-    time.sleep(90)
-    if new_replies:
-        i = (i + 1) % 7
+    i = (i + 1) % 7
