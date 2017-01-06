@@ -6,6 +6,7 @@ import sys
 import os
 from colorama import init, Fore, Back, Style
 
+from tnotify.source import *
 
 
 def init_credentials(filename="auth.json"):
@@ -54,6 +55,15 @@ init(wrap=False)
 fore_colors = [Fore.RED, Fore.GREEN, Fore.YELLOW, Fore.BLUE, Fore.MAGENTA, Fore.CYAN, Fore.WHITE]
 back_colors = [Back.RED, Back.GREEN, Back.YELLOW, Back.BLUE, Back.MAGENTA, Back.CYAN, Back.WHITE]
 i = 0
+
+conn = Source(api)
+for n in conn:
+    msg_str = "reply " if n.msg_type == Notification.Timeline else "DM "
+    try:
+        print("New " + msg_str + "from " + n.sender + ": " + n.text)
+    except UnicodeEncodeError:
+        print("New " + msg_str + "from " + n.sender + ": " + "UnicodeEncodeError")
+    sys.stdout.flush()
 
 # Potential tweepy.error.TweepError for timeout... retry?
 while True:
