@@ -35,16 +35,13 @@ class Source:
             new_dms = False
             bulk_msgs = list()
 
-            # print("looping")
-            # sys.stdout.flush()
-
             # for m, d in zip(reversed(mentions), reversed(messages)):
             for m in reversed(mentions):
                 msg = Notification(m.user.screen_name, m.text, m.id)
+                tmp_msgs[msg.id] = msg
                 # if not m.id in self.msgs:
                 if not msg.id in self.msgs:
                     new_replies = True
-                    tmp_msgs[msg.id] = msg
                     if not self.bulk:
                         yield msg
                     else:
@@ -52,10 +49,10 @@ class Source:
 
             for d in reversed(messages):
                 dm = Notification(d.sender.screen_name, d.text, d.id, Notification.Direct)
+                tmp_dms[dm.id] = dm
                 # if not d.id in self.dms:
                 if not dm.id in self.dms:
                     new_dms = True
-                    tmp_dms[dm.id] = dm
                     if not self.bulk:
                         yield dm
                     else:
@@ -63,7 +60,6 @@ class Source:
 
             # Assert: We can only get here if new messages arrived this loop.
             if self.bulk and bulk_msgs:
-                # print("yielding")
                 yield bulk_msgs
 
             # Replace message dict with those seen this iter of API call.
